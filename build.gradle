@@ -1,0 +1,35 @@
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'eclipse'
+    id 'idea'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JUnit 5 para pruebas unitarias y de rendimiento
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+javafx {
+    version = "17"
+    modules = [ 'javafx.controls', 'javafx.graphics', 'javafx.base' ]
+}
+
+application {
+    mainClass = 'com.passwordmanager.Main'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    
+    // Mostrar resultados de pruebas en la consola
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+    }
+}

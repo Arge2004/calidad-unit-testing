@@ -346,7 +346,7 @@ void testValidate_StrongPassword_AllRulesMet() {
 
 ---
 
-### 4.2. `PasswordGeneratorTest.java` — 5 Tests
+### 4.2. `PasswordGeneratorTest.java` — 6 Tests
 
 #### Test 1: `testGenerate_CorrectLength`
 
@@ -655,7 +655,7 @@ No existe `gradlew` ni `gradlew.bat` en el proyecto. Esto significa que:
 | **Framework de tests** | JUnit 5 (Jupiter) con `@Test`, `@DisplayName`, `assertEquals`, `assertThrows`, `assertTrue` |
 | **Patrón de tests** | AAA (Arrange-Act-Assert) con comentarios en español |
 | **Naming** | `test_<Método>_<Escenario>` |
-| **Tests de unitarios** | 9 tests que cubren casos normales, edge cases, y excepciones |
+| **Tests de unitarios** | 10 tests que cubren casos normales, edge cases, y excepciones |
 | **Tests de rendimiento** | 2 tests con umbrales hardcodeados (5ms individual, 500ms para 10k) |
 | **Build system** | Gradle 9.2.0 con plugins de JavaFX y JUnit 5 |
 | **Cobertura de tests** | `PasswordGenerator` (5 tests), `PasswordValidator` (4 tests), rendimiento (2 tests) |

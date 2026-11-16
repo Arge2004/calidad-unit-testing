@@ -96,6 +96,12 @@ Karate HTML report: `build/karate-reports/karate-summary.html`. JaCoCo report: `
 
 See `build.gradle`. Spring and JUnit versions come from the Spring Boot BOM; only the Spring Boot, Sonar and JavaFX plugins and Karate carry explicit versions.
 
+## Coverage scope (deliberate exclusion)
+
+Coverage is measured only over the **API and business logic** (`model/` and `api/`). The JavaFX desktop layer — `view/`, `controller/` and `Main.java` — is **excluded on purpose** from both the JaCoCo report and Sonar's coverage metric: it needs a graphical environment, and the current goal is to test the API and business rules. This is a scope decision, not an oversight; do not "fix" it by adding those classes back without agreeing a UI testing approach (e.g. TestFX).
+
+The exclusion only affects *coverage*. Sonar's static analysis (bugs, smells, vulnerabilities) still scans every file. The list lives in `build.gradle` (`coverageExcludedClasses` and `sonar.coverage.exclusions`) — keep both in sync.
+
 ## Gotchas
 
 - **No Gradle wrapper** — collaborators must install Gradle 9.x separately

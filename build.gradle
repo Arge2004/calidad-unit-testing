@@ -56,7 +56,19 @@ tasks.named('test') {
     ignoreFailures = true
 }
 
+// Alcance de la cobertura: API y lógica de negocio (model + api).
+// La capa de escritorio JavaFX (view, controller y Main) se excluye A PROPÓSITO:
+// requiere un entorno gráfico y el objetivo actual es probar la API y las reglas de negocio.
+def coverageExcludedClasses = [
+    'com/passwordmanager/view/**',
+    'com/passwordmanager/controller/**',
+    'com/passwordmanager/Main*'
+]
+
 tasks.named('jacocoTestReport') {
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(it) { exclude coverageExcludedClasses }
+    }))
 
     reports {
         html.required = true
@@ -76,6 +88,10 @@ sonar {
         if (sonarHost.contains('sonarcloud.io')) {
             property 'sonar.organization', 'arge2004'
         }
+        // Misma exclusión que en JaCoCo (ver coverageExcludedClasses): solo afecta a la cobertura,
+        // el análisis estático (bugs, smells, vulnerabilidades) sigue cubriendo todo el código.
+        property 'sonar.coverage.exclusions',
+            'src/main/java/com/passwordmanager/view/**,src/main/java/com/passwordmanager/controller/**,src/main/java/com/passwordmanager/Main.java'
         property 'sonar.coverage.jacoco.xmlReportPaths',
             layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.xml').get().asFile.path
     }

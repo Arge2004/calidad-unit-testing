@@ -1,0 +1,46 @@
+name: Calidad
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test-and-sonar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Sonar necesita el historial completo para atribuir el código
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.7.0'
+
+      # Pruebas unitarias + Karate + cobertura JaCoCo, y luego el análisis de Sonar.
+      # `test` tiene ignoreFailures=true, así que el siguiente paso falla si hubo pruebas rotas.
+      - name: Pruebas y análisis de SonarCloud
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: gradle test sonar
+
+      - name: Fallar si alguna prueba falló
+        if: always()
+        run: |
+          if grep -l '<failure\|<error' build/test-results/test/*.xml; then
+            echo "Hay pruebas fallidas"; exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reportes
+          path: |
+            build/karate-reports
+            build/reports/jacoco
+            build/reports/tests

@@ -1,6 +1,8 @@
 plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'org.springframework.boot' version '4.1.2'
+    id 'org.sonarqube' version '7.6.0.18749'
     id 'eclipse'
     id 'idea'
     id 'jacoco'
@@ -13,9 +15,19 @@ jacoco {
     toolVersion = "0.8.15"
 }
 dependencies {
-    // JUnit 5 para pruebas unitarias y de rendimiento
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    // Las versiones de Spring y JUnit las gestiona el BOM de Spring Boot
+    implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+
+    // API REST
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+
+    // JUnit para pruebas unitarias y de rendimiento
+    testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Pruebas de API: Spring levanta el servidor y Karate ejecuta los .feature
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'io.karatelabs:karate-junit6:2.1.4'
 }
 
 javafx {
@@ -23,8 +35,19 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.graphics', 'javafx.base' ]
 }
 
+// `gradle run` abre la app de escritorio JavaFX; `gradle bootRun` levanta la API REST
 application {
     mainClass = 'com.passwordmanager.Main'
+}
+
+// Con el plugin `application` presente, Spring Boot tomaría la clase principal de JavaFX;
+// por eso se fija explícitamente la de la API en sus tareas
+tasks.named('bootRun') {
+    mainClass = 'com.passwordmanager.api.ApiApplication'
+}
+
+tasks.named('bootJar') {
+    mainClass = 'com.passwordmanager.api.ApiApplication'
 }
 
 tasks.named('test') {
@@ -39,5 +62,21 @@ tasks.named('jacocoTestReport') {
         html.required = true
         xml.required = true
         csv.required = false
+    }
+}
+
+// Análisis estático en SonarCloud: `SONAR_TOKEN=<token> gradle test sonar`
+// Para un SonarQube local: añadir SONAR_HOST_URL=http://localhost:9000
+def sonarHost = System.getenv('SONAR_HOST_URL') ?: 'https://sonarcloud.io'
+sonar {
+    properties {
+        property 'sonar.projectKey', 'Arge2004_calidad-unit-testing'
+        property 'sonar.projectName', 'calidad-unit-testing'
+        property 'sonar.host.url', sonarHost
+        if (sonarHost.contains('sonarcloud.io')) {
+            property 'sonar.organization', 'arge2004'
+        }
+        property 'sonar.coverage.jacoco.xmlReportPaths',
+            layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.xml').get().asFile.path
     }
 }

@@ -3,6 +3,8 @@ package com.passwordmanager.model;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.regex.Pattern;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PasswordGeneratorTest {
@@ -92,9 +94,9 @@ class PasswordGeneratorTest {
 
         // Assert (Verificar)
         assertNotNull(contrasena);
-        assertTrue(contrasena.matches(".*[A-Z].*"), "Debe contener al menos una mayúscula.");
-        assertTrue(contrasena.matches(".*[a-z].*"), "Debe contener al menos una minúscula.");
-        assertTrue(contrasena.matches(".*[0-9].*"), "Debe contener al menos un número.");
-        assertTrue(contrasena.matches(".*[!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?].*"), "Debe contener al menos un carácter especial.");
+        assertTrue(Pattern.compile("[A-Z]").matcher(contrasena).find(), "Debe contener al menos una mayúscula.");
+        assertTrue(Pattern.compile("[a-z]").matcher(contrasena).find(), "Debe contener al menos una minúscula.");
+        assertTrue(Pattern.compile("[0-9]").matcher(contrasena).find(), "Debe contener al menos un número.");
+        assertTrue(Pattern.compile("[!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?]").matcher(contrasena).find(), "Debe contener al menos un carácter especial.");
     }
 }

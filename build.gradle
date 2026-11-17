@@ -25,7 +25,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // Pruebas de API: Spring levanta el servidor y Karate ejecuta los .feature
+    // Pruebas de aceptación: Spring levanta el servidor y Karate ejecuta los .feature (uno por HU)
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'io.karatelabs:karate-junit6:2.1.4'
 }

@@ -38,7 +38,7 @@ class PasswordPerformanceTest {
         PasswordValidator validator = new PasswordValidator();
         int iteraciones = 10_000;
         int longitud = 12;
-        long limiteMilisegundos = 500;
+        long limiteMilisegundos = 300;
 
         // Act (Actuar)
         long inicio = System.nanoTime();

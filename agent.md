@@ -76,7 +76,7 @@ MVC pattern under `src/main/java/com/passwordmanager/`:
 | `model/PasswordValidatorTest.java` | 4 tests | Empty, short, medium, strong passwords |
 | `model/PasswordGeneratorTest.java` | 5 tests | Correct length, single-category, invalid inputs, all-types guarantee |
 | `performance/PasswordPerformanceTest.java` | 2 tests | Single gen <5ms, 10k bulk gen+val <500ms |
-| `api/PasswordApiKarateTest.java` | 1 test (27 Karate scenarios) | Boots the API on a random port and runs every `.feature` under `src/test/resources/karate/` over HTTP |
+| `api/PasswordAcceptanceTest.java` | 1 test (29 Karate scenario runs) | Acceptance tests: boots the API on a random port and runs every `.feature` under `src/test/resources/karate/aceptacion/` over HTTP. One feature per user story (`@HU-xx`), one scenario per acceptance criterion (`@CA-xx.y`); stories and traceability matrix in `docs/historias-de-usuario.md` |
 
 Karate HTML report: `build/karate-reports/karate-summary.html`. JaCoCo report: `build/reports/jacoco/test/html/index.html`.
 

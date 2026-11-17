@@ -22,7 +22,7 @@ jobs:
         with:
           gradle-version: '9.7.0'
 
-      # Pruebas unitarias + Karate + cobertura JaCoCo, y luego el análisis de Sonar.
+      # Pruebas unitarias + aceptación (Karate) + cobertura JaCoCo, y luego el análisis de Sonar.
       # `test` tiene ignoreFailures=true, así que el siguiente paso falla si hubo pruebas rotas.
       - name: Pruebas y análisis de SonarCloud
         env:

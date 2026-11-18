@@ -1,6 +1,8 @@
 plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'org.springframework.boot' version '4.1.2'
+    id 'org.sonarqube' version '7.6.0.18749'
     id 'eclipse'
     id 'idea'
     id 'jacoco'
@@ -13,9 +15,19 @@ jacoco {
     toolVersion = "0.8.15"
 }
 dependencies {
-    // JUnit 5 para pruebas unitarias y de rendimiento
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    // Las versiones de Spring y JUnit las gestiona el BOM de Spring Boot
+    implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+
+    // API REST
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+
+    // JUnit para pruebas unitarias y de rendimiento
+    testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Pruebas de aceptación: Spring levanta el servidor y Karate ejecuta los .feature (uno por HU)
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'io.karatelabs:karate-junit6:2.1.4'
 }
 
 javafx {
@@ -23,8 +35,19 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.graphics', 'javafx.base' ]
 }
 
+// `gradle run` abre la app de escritorio JavaFX; `gradle bootRun` levanta la API REST
 application {
     mainClass = 'com.passwordmanager.Main'
+}
+
+// Con el plugin `application` presente, Spring Boot tomaría la clase principal de JavaFX;
+// por eso se fija explícitamente la de la API en sus tareas
+tasks.named('bootRun') {
+    mainClass = 'com.passwordmanager.api.ApiApplication'
+}
+
+tasks.named('bootJar') {
+    mainClass = 'com.passwordmanager.api.ApiApplication'
 }
 
 tasks.named('test') {
@@ -33,11 +56,43 @@ tasks.named('test') {
     ignoreFailures = true
 }
 
+// Alcance de la cobertura: API y lógica de negocio (model + api).
+// La capa de escritorio JavaFX (view, controller y Main) se excluye A PROPÓSITO:
+// requiere un entorno gráfico y el objetivo actual es probar la API y las reglas de negocio.
+def coverageExcludedClasses = [
+    'com/passwordmanager/view/**',
+    'com/passwordmanager/controller/**',
+    'com/passwordmanager/Main*'
+]
+
 tasks.named('jacocoTestReport') {
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(it) { exclude coverageExcludedClasses }
+    }))
 
     reports {
         html.required = true
         xml.required = true
         csv.required = false
+    }
+}
+
+// Análisis estático en SonarCloud: `SONAR_TOKEN=<token> gradle test sonar`
+// Para un SonarQube local: añadir SONAR_HOST_URL=http://localhost:9000
+def sonarHost = System.getenv('SONAR_HOST_URL') ?: 'https://sonarcloud.io'
+sonar {
+    properties {
+        property 'sonar.projectKey', 'Arge2004_calidad-unit-testing'
+        property 'sonar.projectName', 'calidad-unit-testing'
+        property 'sonar.host.url', sonarHost
+        if (sonarHost.contains('sonarcloud.io')) {
+            property 'sonar.organization', 'arge2004'
+        }
+        // Misma exclusión que en JaCoCo (ver coverageExcludedClasses): solo afecta a la cobertura,
+        // el análisis estático (bugs, smells, vulnerabilidades) sigue cubriendo todo el código.
+        property 'sonar.coverage.exclusions',
+            'src/main/java/com/passwordmanager/view/**,src/main/java/com/passwordmanager/controller/**,src/main/java/com/passwordmanager/Main.java'
+        property 'sonar.coverage.jacoco.xmlReportPaths',
+            layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.xml').get().asFile.path
     }
 }

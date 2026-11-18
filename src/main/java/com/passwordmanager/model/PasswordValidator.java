@@ -8,17 +8,18 @@ import java.util.List;
  * y proveer retroalimentación de seguridad.
  */
 public class PasswordValidator {
+    // Cada patrón describe un solo carácter y se busca con find(): evita el backtracking de ".*X.*"
     private static final Pattern MAYUSCULAS =
-        Pattern.compile(".*[A-Z].*");
+        Pattern.compile("[A-Z]");
 
     private static final Pattern MINUSCULAS =
-        Pattern.compile(".*[a-z].*");
+        Pattern.compile("[a-z]");
 
     private static final Pattern NUMEROS =
-        Pattern.compile(".*[0-9].*");
+        Pattern.compile("\\d");
 
     private static final Pattern ESPECIALES =
-        Pattern.compile(".*[!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?].*");
+        Pattern.compile("[!@#$%^&*()\\-_=+\\[\\]{}|;:,.<>?]");
     public enum Strength {
         DEBIL,
         MEDIA,
@@ -78,21 +79,21 @@ public class PasswordValidator {
         }
 
         // Regla 2: Letras Mayúsculas
-        if (MAYUSCULAS.matcher(password).matches()) {
+        if (MAYUSCULAS.matcher(password).find()) {
             score++;
         } else {
             feedback.add("Debe contener al menos una letra mayúscula.");
         }
 
         // Regla 3: Letras Minúsculas
-        if (MINUSCULAS.matcher(password).matches()) {
+        if (MINUSCULAS.matcher(password).find()) {
             score++;
         } else {
             feedback.add("Debe contener al menos una letra minúscula.");
         }
 
         // Regla 4: Números
-        if (NUMEROS.matcher(password).matches()) {
+        if (NUMEROS.matcher(password).find()) {
             score++;
         } else {
             feedback.add("Debe contener al menos un número.");
@@ -100,24 +101,23 @@ public class PasswordValidator {
 
         // Regla 5: Caracteres Especiales
         // Usamos una expresión regular que busca símbolos comunes
-        if (ESPECIALES.matcher(password).matches()) {
+        if (ESPECIALES.matcher(password).find()) {
             score++;
         } else {
             feedback.add("Debe contener al menos un carácter especial (ej. !, @, #, $, etc.).");
         }
 
-        // Clasificar fortaleza basado en el score (las contraseñas de longitud menor a 8 son siempre DÉBILES)
-        Strength strength;
-        if (password.length() < 8) {
-            strength = Strength.DEBIL;
-        } else if (score <= 2) {
-            strength = Strength.DEBIL;
-        } else if (score <= 4) {
-            strength = Strength.MEDIA;
-        } else {
-            strength = Strength.FUERTE;
-        }
+        return new ValidationResult(classify(password.length(), score), feedback, score);
+    }
 
-        return new ValidationResult(strength, feedback, score);
+    /**
+     * Clasifica la fortaleza según el puntaje. Las contraseñas de menos de 8 caracteres
+     * son siempre DÉBILES, sin importar cuántas reglas más cumplan.
+     */
+    private static Strength classify(int length, int score) {
+        if (length < 8 || score <= 2) {
+            return Strength.DEBIL;
+        }
+        return score <= 4 ? Strength.MEDIA : Strength.FUERTE;
     }
 }

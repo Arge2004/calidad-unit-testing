@@ -5,8 +5,6 @@ import com.passwordmanager.model.PasswordValidator;
 import com.passwordmanager.view.PasswordView;
 import javafx.event.ActionEvent;
 
-import java.util.List;
-
 /**
  * Controlador que coordina la comunicación entre la vista (PasswordView)
  * y los modelos de generación y validación de contraseñas utilizando JavaFX.

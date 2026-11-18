@@ -20,7 +20,6 @@ public class PasswordView {
 
     // Controles de Generación
     private Slider sliderLength;
-    private Label lblLengthValue;
     private CheckBox chkUpper;
     private CheckBox chkLower;
     private CheckBox chkDigits;
@@ -86,7 +85,7 @@ public class PasswordView {
         HBox pnlSliderLabel = new HBox();
         pnlSliderLabel.setAlignment(Pos.CENTER_LEFT);
         Label lblLength = new Label("Longitud: ");
-        lblLengthValue = new Label("12");
+        Label lblLengthValue = new Label("12");
         lblLengthValue.setStyle("-fx-font-weight: bold; -fx-text-fill: #00adb5;");
         pnlSliderLabel.getChildren().addAll(lblLength, lblLengthValue);
 
